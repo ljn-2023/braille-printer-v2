@@ -260,6 +260,26 @@ action="/finish">
 
 </form>
 
+<div style="margin:20px 0;">
+
+<form method="post" action="/move_x" style="display:inline-block;">
+
+<input type="hidden" name="direction" value="left">
+
+<button type="submit" style="background-color:#ff9800;">X 左移</button>
+
+</form>
+
+<form method="post" action="/move_x" style="display:inline-block;">
+
+<input type="hidden" name="direction" value="right">
+
+<button type="submit" style="background-color:#4caf50;">X 右移</button>
+
+</form>
+
+</div>
+
 <p>
 
 {{result}}
@@ -354,6 +374,20 @@ def finish():
         pass
 
     return redirect("/")
+
+
+@app.route("/move_x", methods=["POST"])
+def handle_move_x():
+    direction = request.form.get("direction", "")
+    mm = 1.0 if direction == "right" else -1.0
+
+    try:
+        requests.get(ESP32_BASE + "/movex", params={"mm": mm}, timeout=10)
+        result = f"X轴 {'右移' if direction == 'right' else '左移'} 1mm"
+    except Exception as e:
+        result = str(e)
+
+    return render_template_string(HTML, result=result, code="")
 
 
 def open_browser():

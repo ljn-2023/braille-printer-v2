@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/XH/Desktop/braille-printer-v2/**)"
+    ]
+  }
+}

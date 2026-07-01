@@ -58,8 +58,8 @@ float currentXmm = 0;
 
 #define Y_PWM_SPEED 255
 
-#define MS_PER_MM 120.0
-#define LINE_STEP_MM 150.0
+#define MS_PER_MM 120.0 
+#define LINE_STEP_MM 35.0 //换行的距离
 #define EJECT_MM 200.0
 
 float currentYmm = 0;
@@ -363,6 +363,24 @@ void handlePrint() {
   printBrailleLine(code);
 }
 
+void handleMoveX() {
+  if (!server.hasArg("mm")) {
+    server.send(400, "text/plain; charset=utf-8", "缺少 mm 参数");
+    return;
+  }
+
+  float mm = server.arg("mm").toFloat();
+  float target = currentXmm + mm;
+
+  if (target < X_MIN_MM) target = X_MIN_MM;
+  if (target > X_MAX_MM) target = X_MAX_MM;
+
+  moveXToMM(target);
+  waitXArrive();
+
+  server.send(200, "text/plain; charset=utf-8", "X轴移动到: " + String(target) + " mm");
+}
+
 /* ========= setup ========= */
 void handleFinishY();
 void setup() {
@@ -428,6 +446,7 @@ void setup() {
 
   server.on("/", handleRoot);
   server.on("/print", handlePrint);
+  server.on("/movex", handleMoveX);
   server.on("/finish", handleFinishY);
   server.begin();
 
